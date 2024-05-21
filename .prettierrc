@@ -1,7 +1,9 @@
-"singleQuote": false,
+{"singleQuote": false,
 "semi": true,
 "trailingComma": "none",
-"overrides": [
+"overrides":
+ [
+{
 
 "files": " *. html",
 "options": {
@@ -10,5 +12,5 @@
 }
 
 }
-
 ]
+}
