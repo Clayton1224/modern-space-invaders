@@ -19,9 +19,14 @@ class grid{
    for(let i = 0; i < columns; i++){
     for(let j = 0; j < rows; j++) { 
         this.invaders.push{new invader()}
+    
+        i: j, * 30,
+        j: j * 30,
+
     }
     
-        }
+        };
+    
 
         
 
