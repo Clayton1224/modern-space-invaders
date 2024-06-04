@@ -29,3 +29,22 @@ function retangularCollision({ rectangle1, rectangle2}) {
     );
 }
     
+function creatParticles({ object, color, fades}) {
+    for (let i = 0; i < 15; i++) {
+        creatParticles.push(
+            new Particle({
+                position: {
+                    x: object.position.x + object.width / 2,
+                    y: object.position.y + object.height / 2,
+                },
+                velocity: {
+                    x: (Math.random() -0.5) *2,
+                    y: (math.random() - 0.5) *2,
+                },
+                radius: Math.random()  * 3,
+                color: color,
+                fades: fades
+            })
+        );
+    }
+}
