@@ -80,3 +80,23 @@ function init() {
         );
     }
 }
+
+function endGame() {
+    Audio.gameOver.player.play();
+    player.opacity = 0;
+    game.over = true;
+}
+
+setTimeout(() => {  
+    game.active = false;
+    document.querySelector("#restartScreen").style.display = "flex";
+}, 2000);
+
+creatParticles({
+    object: player,
+    color: "white",
+    fades: true
+});
+
+
+
