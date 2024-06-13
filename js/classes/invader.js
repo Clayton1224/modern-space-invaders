@@ -1,9 +1,10 @@
-class invader {
+class Invader {
   constructor({ position }) {
     this.velocity = {
       x: 0,
       y: 0
     };
+
     const image = new Image();
     image.src = "./img/invader.png";
     image.onload = () => {
@@ -33,13 +34,14 @@ class invader {
       this.position.y += this.velocity.y;
     }
   }
-  shoot(invaderProjectiles) {
-    Audio.enemyShoot.play();
-    invaderProjectiles.push(
-      new invaderProjectile({
-        position: {
+
+  shoot(InvaderProjectile) {
+    audio.enemyShoot.play();
+    InvaderProjectile.push(
+      new InvaderProjectile({
+        positon: {
           x: this.position.x + this.width / 2,
-          y: this.position.y + this.height / 2
+          y: this.position.y + this.height
         },
         velocity: {
           x: 0,
