@@ -1,21 +1,23 @@
 class Bomb {
+  static radius = 30;
   constructor({ position, velocity }) {
     this.position = position;
     this.velocity = velocity;
     this.radius = 0;
-    this.color = "";
+    this.color = "red";
     this.opacity = 1;
     this.active = false;
 
-    WebGLSampler.toString(this, {
+    gsap.to(this, {
       radius: 30
     });
   }
+
   draw() {
     c.save();
     c.globalAlpha = this.opacity;
     c.beginPath();
-    c.arc(this.position.X, this.position.Y, this.radius, 0, Math.PI * 2);
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
     c.closePath();
     c.fillStyle = this.color;
     c.fill();
@@ -44,10 +46,12 @@ class Bomb {
     this.active = true;
     this.velocity.x = 0;
     this.velocity.y = 0;
+
     gsap.to(this, {
       radius: 200,
       color: "red"
     });
+
     gsap.to(this, {
       delay: 0.1,
       opacity: 0,
@@ -56,7 +60,7 @@ class Bomb {
   }
 }
 
-class PoweUp {
+class PowerUp {
   constructor({ position, velocity }) {
     this.position = position;
     this.velocity = velocity;

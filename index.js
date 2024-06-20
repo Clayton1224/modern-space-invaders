@@ -8,7 +8,7 @@ canvas.height = 576;
 let player = new Player();
 let projectiles = [];
 let grids = [];
-let invadersProjectiles = [];
+let invaderProjectiles = [];
 let particles = [];
 let bombs = [];
 let powerUps = [];
@@ -20,7 +20,7 @@ let keys = {
   ArrowRight: {
     pressed: false
   },
-  Space: {
+  space: {
     pressed: false
   }
 };
@@ -34,18 +34,16 @@ let game = {
 };
 
 let score = 0;
-
 let spawnBuffer = 500;
 let fps = 60;
 let fpsInterval = 1000 / fps;
-
 let msPrev = window.performance.now();
 
 function init() {
   player = new Player();
   projectiles = [];
   grids = [];
-  invadersProjectiles = [];
+  invaderProjectiles = [];
   particles = [];
   bombs = [];
   powerUps = [];
@@ -57,14 +55,13 @@ function init() {
     ArrowRight: {
       pressed: false
     },
-    Space: {
+    space: {
       pressed: false
     }
   };
 
   frames = 0;
   randomInterval = Math.floor(Math.random() * 500 + 500);
-
   game = {
     over: false,
     active: true
@@ -100,7 +97,7 @@ function endGame() {
 
   setTimeout(() => {
     game.active = false;
-    document.querySelector("restartScreen").computedStyleMap.display = "flex";
+    document.querySelector("#restartScreen").style.display = "flex";
   }, 2000);
 
   createParticles({
@@ -124,8 +121,9 @@ function animate() {
   c.fillStyle = "black";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let i = powerUps.leght - 1; i >= 0; i--) {
-    const powerUp = powerIps[i];
+  for (let i = powerUps.length - 1; i >= 0; i--) {
+    const powerUp = powerUps[i];
+
     if (powerUp.position.x - powerUp.radius >= canvas.width)
       powerUps.splice(i, 1);
     else powerUp.update();
@@ -146,7 +144,7 @@ function animate() {
     );
   }
 
-  if (frames % 200 === 0 && bombs.leght < 3) {
+  if (frames % 200 === 0 && bombs.length < 3) {
     bombs.push(
       new Bomb({
         position: {
@@ -161,27 +159,29 @@ function animate() {
     );
   }
 
-  for (let i = bombs.leght - 1; i >= 0; i--) {
+  for (let i = bombs.length - 1; i >= 0; i--) {
     const bomb = bombs[i];
-    if (bomb.opasity <= 0) {
+
+    if (bomb.opacity <= 0) {
       bombs.splice(i, 1);
     } else bomb.update();
   }
 
   player.update();
 
-  for (let i = player.particles.leght - 1; i >= 0; i--) {
+  for (let i = player.particles.length - 1; i >= 0; i--) {
     const particle = player.particles[i];
     particle.update();
+
     if (particle.opacity === 0) player.particles[i].splice(i, 1);
   }
+
   particles.forEach((particle, i) => {
     if (particle.position.y - particle.radius >= canvas.height) {
       particle.position.x = Math.random() * canvas.width;
       particle.position.y = -particle.radius;
     }
 
-    particle.update();
     if (particle.opacity <= 0) {
       setTimeout(() => {
         particles.splice(i, 1);
@@ -191,33 +191,31 @@ function animate() {
     }
   });
 
-  invadersProjectiles.forEach((invaderProjectile, index) => {
+  invaderProjectiles.forEach((invaderProjectile, index) => {
     if (
       invaderProjectile.position.y + invaderProjectile.height >=
       canvas.height
     ) {
       setTimeout(() => {
-        invaderProjectile.splice(index, 1);
+        invaderProjectiles.splice(index, 1);
       }, 0);
-    } else {
-      invaderProjectile.update();
-    }
+    } else invaderProjectile.update();
 
     if (
       rectangularCollision({
-        rectangular1: invaderProjectile,
-        rectangular2: player
+        rectangle1: invaderProjectile,
+        rectangle2: player
       })
     ) {
-      invaderProjectile.splice(index, 1);
+      invaderProjectiles.splice(index, 1);
       endGame();
     }
   });
 
-  for (let i = Projectiles.leght - 1; i >= 0; i--) {
-    const projectile = projectile[i];
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const projectile = projectiles[i];
 
-    for (let j = bombs.leght - 1; j >= 0; j--) {
+    for (let j = bombs.length - 1; j >= 0; j--) {
       const bomb = bombs[j];
 
       if (
@@ -228,11 +226,12 @@ function animate() {
           projectile.radius + bomb.radius &&
         !bomb.active
       ) {
-        projectile.splice(i, 1);
+        projectiles.splice(i, 1);
         bomb.explode();
       }
     }
-    for (let j = powerUps.leght - 1; j >= 0; j--) {
+
+    for (let j = powerUps.length - 1; j >= 0; j--) {
       const powerUp = powerUps[j];
 
       if (
@@ -240,11 +239,10 @@ function animate() {
           projectile.position.x - powerUp.position.x,
           projectile.position.y - powerUp.position.y
         ) <
-          projectile.radius + powerUp.radius &&
-        !powerUp.active
+        projectile.radius + powerUp.radius
       ) {
-        projectile.splice(i, 1);
-        powerUp.splice(j, 1);
+        projectiles.splice(i, 1);
+        powerUps.splice(j, 1);
         player.powerUp = "Metralhadora";
         audio.bonus.play();
 
@@ -253,8 +251,9 @@ function animate() {
         }, 5000);
       }
     }
+
     if (projectile.position.y + projectile.radius <= 0) {
-      projectile.splice(i, 1);
+      projectiles.splice(i, 1);
     } else {
       projectile.update();
     }
@@ -263,17 +262,17 @@ function animate() {
   grids.forEach((grid, gridIndex) => {
     grid.update();
 
-    if (frames % 100 === 0 && grid.invaders.leght > 0) {
-      grid.invaders[Math.floor(Math.random() * grid.invaders.leght)].shoot(
+    if (frames % 100 === 0 && grid.invaders.length > 0) {
+      grid.invaders[Math.floor(Math.random() * grid.invaders.length)].shoot(
         invaderProjectiles
       );
     }
 
-    for (let i = grid.invaders.leght - 1; i >= 0; i--) {
+    for (let i = grid.invaders.length - 1; i >= 0; i--) {
       const invader = grid.invaders[i];
       invader.update({ velocity: grid.velocity });
 
-      for (let j = bombs.leght - 1; j >= 0; j--) {
+      for (let j = bombs.length - 1; j >= 0; j--) {
         const bomb = bombs[j];
 
         const invaderRadius = 15;
@@ -287,7 +286,7 @@ function animate() {
           bomb.active
         ) {
           score += 50;
-          scoreEL.innerHTML = score;
+          scoreEl.innerHTML = score;
 
           grid.invaders.splice(i, 1);
           createScoreLabel({
@@ -312,7 +311,7 @@ function animate() {
           projectile.position.y + projectile.radius >= invader.position.y
         ) {
           setTimeout(() => {
-            const invaderFound = grid.invader.find(
+            const invaderFound = grid.invaders.find(
               (invader2) => invader2 === invader
             );
             const projectileFound = projectiles.find(
@@ -321,11 +320,12 @@ function animate() {
 
             if (invaderFound && projectileFound) {
               score += 100;
-              scoreEL.innerHTML = score;
+              scoreEl.innerHTML = score;
 
               createScoreLabel({
                 object: invader
               });
+
               createParticles({
                 object: invader,
                 fades: true
@@ -335,15 +335,14 @@ function animate() {
               grid.invaders.splice(i, 1);
               projectiles.splice(j, 1);
 
-              if (grid.invaders.leght > 0) {
+              if (grid.invaders.length > 0) {
                 const firstInvader = grid.invaders[0];
-                const lastInvader = grid.invaders[grid.invaders.leght - 1];
+                const lastInvader = grid.invaders[grid.invaders.length - 1];
 
                 grid.width =
                   lastInvader.position.x -
                   firstInvader.position.x +
-                  firstInvader.width;
-
+                  lastInvader.width;
                 grid.position.x = firstInvader.position.x;
               } else {
                 grids.splice(gridIndex, 1);
@@ -355,8 +354,8 @@ function animate() {
 
       if (
         rectangularCollision({
-          rectangular1: invader,
-          rectangular2: player
+          rectangle1: invader,
+          rectangle2: player
         }) &&
         !game.over
       )
@@ -387,7 +386,7 @@ function animate() {
   }
 
   if (
-    keys.Space.pressed &&
+    keys.space.pressed &&
     player.powerUp === "Metralhadora" &&
     frames % 2 === 0 &&
     !game.over
@@ -407,6 +406,7 @@ function animate() {
       })
     );
   }
+
   frames++;
 }
 
@@ -422,7 +422,6 @@ document.querySelector("#startButton").addEventListener("click", () => {
 
 document.querySelector("#restartButton").addEventListener("click", () => {
   audio.select.play();
-
   document.querySelector("#restartScreen").style.display = "none";
   init();
   animate();
@@ -438,25 +437,26 @@ addEventListener("keydown", ({ key }) => {
     case "ArrowRight":
       keys.ArrowRight.pressed = true;
       break;
-    case "Space":
+    case " ":
       keys.space.pressed = true;
 
       if (player.powerUp === "Metralhadora") return;
 
       audio.shoot.play();
-      projectiles.push(new Projectile({
-        position: {
-          x: player.position.x + player.width / 2,
-          y: player.position.y
-        },
-        velocity: {
-          x: 0,
-          y: -10
-        },
-        color: "yellow"
-      })
-    );
-    break;
+      projectiles.push(
+        new Projectile({
+          position: {
+            x: player.position.x + player.width / 2,
+            y: player.position.y
+          },
+          velocity: {
+            x: 0,
+            y: -10
+          }
+        })
+      );
+
+      break;
   }
 });
 
@@ -468,8 +468,9 @@ addEventListener("keyup", ({ key }) => {
     case "ArrowRight":
       keys.ArrowRight.pressed = false;
       break;
-    case "Space":
+    case " ":
       keys.space.pressed = false;
+
       break;
   }
 });
